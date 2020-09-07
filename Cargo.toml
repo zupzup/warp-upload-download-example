@@ -5,7 +5,7 @@ authors = ["Mario Zupan <mario@zupzup.org>"]
 edition = "2018"
 
 [dependencies]
-tokio = { version = "0.2.21", features = ["macros", "rt-threaded"] }
+tokio = { version = "0.2.21", features = ["macros", "rt-threaded", "fs"] }
 warp = "0.2.3"
 uuid = { version = "0.8", features = ["v4"] }
 futures = { version = "=0.3.5", default-features = false }
