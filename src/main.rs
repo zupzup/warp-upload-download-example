@@ -37,7 +37,7 @@ async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
                         file_ending = "pdf";
                     }
                     "image/png" => {
-                        file_ending = "pnd";
+                        file_ending = "png";
                     }
                     v => {
                         eprintln!("invalid file type found: {}", v);
