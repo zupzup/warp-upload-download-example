@@ -1,12 +1,8 @@
 use bytes::BufMut;
-use futures::TryStreamExt;
+use futures::{StreamExt, TryStreamExt};
 use std::convert::Infallible;
 use uuid::Uuid;
-use warp::{
-    http::StatusCode,
-    multipart::{FormData, Part},
-    Filter, Rejection, Reply,
-};
+use warp::{http::StatusCode, multipart::FormData, Filter, Rejection, Reply};
 
 #[tokio::main]
 async fn main() {
@@ -22,12 +18,8 @@ async fn main() {
 }
 
 async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
-    let parts: Vec<Part> = form.try_collect().await.map_err(|e| {
-        eprintln!("form error: {}", e);
-        warp::reject::reject()
-    })?;
-
-    for p in parts {
+    let mut parts = form.into_stream();
+    while let Some(Ok(p)) = parts.next().await {
         if p.name() == "file" {
             let content_type = p.content_type();
             let file_ending;
@@ -62,7 +54,7 @@ async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
                     warp::reject::reject()
                 })?;
 
-            let file_name = format!("./files/{}.{}", Uuid::new_v4().to_string(), file_ending);
+            let file_name = format!("./files/{}.{}", Uuid::new_v4(), file_ending);
             tokio::fs::write(&file_name, value).await.map_err(|e| {
                 eprint!("error writing file: {}", e);
                 warp::reject::reject()
